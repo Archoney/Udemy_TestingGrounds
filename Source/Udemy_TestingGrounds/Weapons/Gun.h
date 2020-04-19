@@ -20,6 +20,7 @@ class UDEMY_TESTINGGROUNDS_API AGun : public AActor
 public:
 	AGun();
 
+	UFUNCTION(BlueprintCallable, Category = "Gun")
 	void OnFire();
 
 	/** Gun muzzle's offset from the characters location */
@@ -38,10 +39,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	class UAnimMontage* FireAnimation;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun")
+	float ReloadTime;
+
 	UAnimInstance* AnimInstance;
 
 protected:
 	virtual void BeginPlay() override;
 
 private:
+	float FireTime{0.0f};
 };

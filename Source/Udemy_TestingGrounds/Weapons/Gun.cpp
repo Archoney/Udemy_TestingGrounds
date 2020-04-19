@@ -28,32 +28,32 @@ void AGun::BeginPlay()
 
 void AGun::OnFire()
 {
+	UWorld* const World = GetWorld();
+	if (World == NULL || World->TimeSeconds - FireTime < ReloadTime)
+		return;
+
 	// try and fire a projectile
 	if (ProjectileClass != NULL)
 	{
-		UWorld* const World = GetWorld();
-		if (World != NULL)
-		{
-			const FRotator SpawnRotation = FP_MuzzleLocation->GetComponentRotation();
-			// MuzzleOffset is in camera space, so transform it to world space before
-			// offsetting from the character location to find the final muzzle
-			// position
-			const FVector SpawnLocation =
-				((FP_MuzzleLocation != nullptr)
-						? FP_MuzzleLocation->GetComponentLocation()
-						: GetActorLocation()) +
-				SpawnRotation.RotateVector(GunOffset);
+		const FRotator SpawnRotation = FP_MuzzleLocation->GetComponentRotation();
+		// MuzzleOffset is in camera space, so transform it to world space before
+		// offsetting from the character location to find the final muzzle
+		// position
+		const FVector SpawnLocation =
+			((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation()
+											: GetActorLocation()) +
+			SpawnRotation.RotateVector(GunOffset);
 
-			// Set Spawn Collision Handling Override
-			FActorSpawnParameters ActorSpawnParams;
-			ActorSpawnParams.SpawnCollisionHandlingOverride =
-				ESpawnActorCollisionHandlingMethod::
-					AdjustIfPossibleButDontSpawnIfColliding;
+		// Set Spawn Collision Handling Override
+		FActorSpawnParameters ActorSpawnParams;
+		ActorSpawnParams.SpawnCollisionHandlingOverride =
+			ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 
-			// spawn the projectile at the muzzle
-			World->SpawnActor<AProjectile>(
-				ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-		}
+		// spawn the projectile at the muzzle
+		World->SpawnActor<AProjectile>(
+			ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+
+		FireTime = World->TimeSeconds;
 	}
 
 	// try and play the sound if specified
